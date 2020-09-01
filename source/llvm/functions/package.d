@@ -7,6 +7,15 @@ import std.range : chain;
 import llvm.config;
 import llvm.types;
 
+private enum llvmInitializeTargetInfo = LLVM_Targets.map!(t => "LLVMInitialize" ~ t ~ "TargetInfo();").joiner.array.orEmpty;
+private enum llvmInitializeTarget = LLVM_Targets.map!(t => "LLVMInitialize" ~ t ~ "Target();").joiner.array.orEmpty;
+private enum llvmInitializeTargetMC = LLVM_Targets.map!(t => "LLVMInitialize" ~ t ~ "TargetMC();").joiner.array.orEmpty;
+private enum llvmInitializeAsmPrinter = LLVM_AsmPrinters.map!(t => "LLVMInitialize" ~ t ~ "AsmPrinter();").joiner.array.orEmpty;
+private enum llvmInitializeAsmParser = LLVM_AsmParsers.map!(t => "LLVMInitialize" ~ t ~ "AsmParser();").joiner.array.orEmpty;
+private enum llvmInitializeDisassembler = LLVM_Disassemblers.map!(t => "LLVMInitialize" ~ t ~ "Disassembler();").joiner.array.orEmpty;
+
+@nogc:
+
 private nothrow auto orEmpty(T)(T v)
 {
     return v? v : "";
@@ -14,32 +23,32 @@ private nothrow auto orEmpty(T)(T v)
 
 nothrow void LLVMInitializeAllTargetInfos()
 {
-    mixin(LLVM_Targets.map!(t => "LLVMInitialize" ~ t ~ "TargetInfo();").joiner.array.orEmpty);
+	mixin(llvmInitializeTargetInfo);
 }
 
 nothrow void LLVMInitializeAllTargets()
 {
-    mixin(LLVM_Targets.map!(t => "LLVMInitialize" ~ t ~ "Target();").joiner.array.orEmpty);
+	mixin(llvmInitializeTarget);
 }
 
 nothrow void LLVMInitializeAllTargetMCs()
 {
-    mixin(LLVM_Targets.map!(t => "LLVMInitialize" ~ t ~ "TargetMC();").joiner.array.orEmpty);
+	mixin(llvmInitializeTargetMC);
 }
 
 nothrow void LLVMInitializeAllAsmPrinters()
 {
-    mixin(LLVM_AsmPrinters.map!(t => "LLVMInitialize" ~ t ~ "AsmPrinter();").joiner.array.orEmpty);
+	mixin(llvmInitializeAsmPrinter);
 }
 
 nothrow void LLVMInitializeAllAsmParsers()
 {
-    mixin(LLVM_AsmParsers.map!(t => "LLVMInitialize" ~ t ~ "AsmParser();").joiner.array.orEmpty);
+	mixin(llvmInitializeAsmParser);
 }
 
 nothrow void LLVMInitializeAllDisassemblers()
 {
-    mixin(LLVM_Disassemblers.map!(t => "LLVMInitialize" ~ t ~ "Disassembler();").joiner.array.orEmpty);
+	mixin(llvmInitializeDisassembler);
 }
 
 nothrow LLVMBool LLVMInitializeNativeTarget()

@@ -8,6 +8,15 @@ import llvm.config;
 import llvm.types;
 import core.stdc.stdint;
 
+private enum llvmInitializeTargetInfo = LLVM_Targets.map!(t => "nothrow void LLVMInitialize" ~ t ~ "TargetInfo();").joiner.array.orEmpty;
+private enum llvmInitializeTarget = LLVM_Targets.map!(t => "nothrow void LLVMInitialize" ~ t ~ "Target();").joiner.array.orEmpty;
+private enum llvmInitializeTargetMC = LLVM_Targets.map!(t => "nothrow void LLVMInitialize" ~ t ~ "TargetMC();").joiner.array.orEmpty;
+private enum llvmInitializeAsmPrinter = LLVM_AsmPrinters.map!(t => "nothrow void LLVMInitialize" ~ t ~ "AsmPrinter();").joiner.array.orEmpty;
+private enum llvmInitializeAsmParser = LLVM_AsmParsers.map!(t => "nothrow void LLVMInitialize" ~ t ~ "AsmParser();").joiner.array.orEmpty;
+private enum llvmInitializeDisassembler = LLVM_Disassemblers.map!(t => "nothrow void LLVMInitialize" ~ t ~ "Disassembler();").joiner.array.orEmpty;
+
+@nogc:
+
 private nothrow auto orEmpty(T)(T v)
 {
     return v? v : "";
@@ -1930,12 +1939,12 @@ const(char)* LLVMGetRelocationValueString(LLVMRelocationIteratorRef RI);
 
 /+ Target information +/
 
-mixin(LLVM_Targets.map!(t => "nothrow void LLVMInitialize" ~ t ~ "TargetInfo();").joiner.array.orEmpty);
-mixin(LLVM_Targets.map!(t => "nothrow void LLVMInitialize" ~ t ~ "Target();").joiner.array.orEmpty);
-mixin(LLVM_Targets.map!(t => "nothrow void LLVMInitialize" ~ t ~ "TargetMC();").joiner.array.orEmpty);
-mixin(LLVM_AsmPrinters.map!(t => "nothrow void LLVMInitialize" ~ t ~ "AsmPrinter();").joiner.array.orEmpty);
-mixin(LLVM_AsmParsers.map!(t => "nothrow void LLVMInitialize" ~ t ~ "AsmParser();").joiner.array.orEmpty);
-mixin(LLVM_Disassemblers.map!(t => "nothrow void LLVMInitialize" ~ t ~ "Disassembler();").joiner.array.orEmpty);
+mixin(llvmInitializeTargetInfo);
+mixin(llvmInitializeTarget);
+mixin(llvmInitializeTargetMC);
+mixin(llvmInitializeAsmPrinter);
+mixin(llvmInitializeAsmParser);
+mixin(llvmInitializeDisassembler);
 
 static if (LLVM_Version >= asVersion(3, 9, 0)) {
     LLVMTargetDataRef LLVMGetModuleDataLayout(LLVMModuleRef M);
